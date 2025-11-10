@@ -1,8 +1,6 @@
 mod cli;
 mod docker;
 use clap::Parser;
-use cli::{Cli, Command, ListCommands};
-use docker::DockerClient;
 
 
 #[tokio::main]
@@ -32,7 +30,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
             cli::ListCommands::Images => {
                 println!("Listing all Docker images...");
-                // TODO: Implement list_images
+                match docker_client.list_images().await {
+                    Ok(images) => {
+                        for image in images {
+                            println!(
+                                "-> ID: {}, RepoTags: {:?}",
+                                image.id,
+                                image.repo_tags
+                            );
+                        }
+                    }
+                    Err(e) => {
+                        eprintln!("Error listing images: {}", e);
+                    }
+                }
             }
         },
     }

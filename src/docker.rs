@@ -1,7 +1,7 @@
 use bollard::Docker;
-use bollard::query_parameters::ListContainersOptions;
+use bollard::query_parameters::{ListContainersOptions, ListImagesOptions};
 use bollard::errors::Error;
-use bollard::models::ContainerSummary;
+use bollard::models::{ContainerSummary, ImageSummary};
 
 pub struct DockerClient {
     docker: Docker,
@@ -25,6 +25,15 @@ impl DockerClient {
         });
         let containers = self.docker.list_containers(options).await?;
         Ok(containers)
+    }
+    
+    pub async fn list_images(&self) -> Result<Vec<ImageSummary>, Error> {
+        let options = ListImagesOptions {
+            all: true,
+            ..Default::default()
+        };
+        let images = self.docker.list_images(Some(options)).await?;
+        Ok(images)
     }
 }
 
