@@ -13,9 +13,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     match &cli.command {
         cli::Command::List { list_command } => match list_command {
             cli::ListCommands::Containers { all } => {
-                let containers = docker_client.list_containers(*all).await?;
-                for container in containers {
-                    println!("-> {:?}", container);
+                println!("Listing Docker containers...");
+                match docker_client.list_containers(*all).await {
+                    Ok(containers) => {
+                        for container in containers {
+                            println!(
+                                "-> ID: {}, Image: {}, Status: {}",
+                                container.id.unwrap_or_default(),
+                                container.image.unwrap_or_default(),
+                                container.status.unwrap_or_default()
+                            );
+                        }
+                    }
+                    Err(e) => {
+                        eprintln!("Error listing containers: {}", e);
+                    }
                 }
             }
             cli::ListCommands::Images => {
