@@ -20,8 +20,16 @@ pub enum Command {
         list_command: ListCommands,
     },
 
+    /// Start a container
     Start {
         /// Container ID or name to start
+        #[arg(short, long)]
+        container: String,
+    },
+
+    /// Stop a container
+    Stop {
+        /// Container ID or name to stop
         #[arg(short, long)]
         container: String,
     },

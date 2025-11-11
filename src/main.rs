@@ -57,6 +57,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
             }
         }
+        cli::Command::Stop { container } => {
+            println!("Stopping container: {}", container);
+            match docker_client.stop_container(container).await {
+                Ok(_) => {
+                    println!("Container {} stopped successfully.", container);
+                }
+                Err(e) => {
+                    eprintln!("Error stopping container {}: {}", container, e);
+                }
+            }
+        }
     }
     
     Ok(())

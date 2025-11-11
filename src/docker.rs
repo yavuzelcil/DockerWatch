@@ -1,5 +1,5 @@
 use bollard::Docker;
-use bollard::query_parameters::{ListContainersOptions, ListImagesOptions, StartContainerOptions};
+use bollard::query_parameters::{ListContainersOptions, ListImagesOptions, StartContainerOptions, StopContainerOptions};
 use bollard::errors::Error;
 use bollard::models::{ContainerSummary, ImageSummary};
 
@@ -40,6 +40,12 @@ impl DockerClient {
         // Use empty StartContainerOptions
         let options = StartContainerOptions::default();
         self.docker.start_container(container_id, Some(options)).await
+    }
+
+    pub async fn stop_container(&self, container_id: &str) -> Result<(), Error> {
+        // Use default StopContainerOptions (10 seconds timeout)
+        let options = StopContainerOptions::default();
+        self.docker.stop_container(container_id, Some(options)).await
     }
 }
 
