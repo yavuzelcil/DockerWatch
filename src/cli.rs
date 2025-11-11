@@ -33,6 +33,13 @@ pub enum Command {
         #[arg(short, long)]
         container: String,
     },
+
+    /// Pull a Docker image
+    Pull {
+        /// Image name (e.g., nginx:latest or postgres:16)
+        #[arg(short, long)]
+        image: String,
+    },
 }
 
 #[derive(Subcommand)]

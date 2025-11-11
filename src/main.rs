@@ -68,6 +68,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
             }
         }
+        cli::Command::Pull { image } => {
+            println!("Pulling image: {}", image);
+            match docker_client.pull_image(image).await {
+                Ok(_) => {
+                    println!("Image {} pulled successfully.", image);
+                }
+                Err(e) => {
+                    eprintln!("Error pulling image {}: {}", image, e);
+                }
+            }
+        }
     }
     
     Ok(())

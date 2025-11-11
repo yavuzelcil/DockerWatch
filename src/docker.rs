@@ -1,7 +1,8 @@
 use bollard::Docker;
-use bollard::query_parameters::{ListContainersOptions, ListImagesOptions, StartContainerOptions, StopContainerOptions};
+use bollard::query_parameters::{ListContainersOptions, ListImagesOptions, StartContainerOptions, StopContainerOptions, CreateImageOptions};
 use bollard::errors::Error;
 use bollard::models::{ContainerSummary, ImageSummary};
+use futures_util::stream::StreamExt;
 
 pub struct DockerClient {
     docker: Docker,
@@ -46,6 +47,37 @@ impl DockerClient {
         // Use default StopContainerOptions (10 seconds timeout)
         let options = StopContainerOptions::default();
         self.docker.stop_container(container_id, Some(options)).await
+    }
+
+    pub async fn pull_image(&self, image_name: &str) -> Result<(), Error> {
+        // Parse image name and tag (default to "latest" if no tag provided)
+        let (name, tag) = if let Some(pos) = image_name.rfind(':') {
+            (&image_name[..pos], &image_name[pos + 1..])
+        } else {
+            (image_name, "latest")
+        };
+
+        let options = CreateImageOptions {
+            from_image: Some(name.to_string()),
+            tag: Some(tag.to_string()),
+            ..Default::default()
+        };
+
+        let mut stream = self.docker.create_image(Some(options), None, None);
+        
+        // Process the stream to completion
+        while let Some(result) = stream.next().await {
+            match result {
+                Ok(info) => {
+                    if let Some(status) = info.status {
+                        println!("{}", status);
+                    }
+                }
+                Err(e) => return Err(e),
+            }
+        }
+        
+        Ok(())
     }
 }
 
