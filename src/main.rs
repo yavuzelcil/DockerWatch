@@ -45,7 +45,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                 }
             }
-        },
+        }
+        cli::Command::Start { container } => {
+            println!("Starting container: {}", container);
+            match docker_client.start_container(container).await {
+                Ok(_) => {
+                    println!("Container {} started successfully.", container);
+                }
+                Err(e) => {
+                    eprintln!("Error starting container {}: {}", container, e);
+                }
+            }
+        }
     }
     
     Ok(())

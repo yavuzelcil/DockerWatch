@@ -19,6 +19,12 @@ pub enum Command {
         #[command(subcommand)]
         list_command: ListCommands,
     },
+
+    Start {
+        /// Container ID or name to start
+        #[arg(short, long)]
+        container: String,
+    },
 }
 
 #[derive(Subcommand)]
